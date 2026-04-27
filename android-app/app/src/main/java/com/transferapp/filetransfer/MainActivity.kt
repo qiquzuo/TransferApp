@@ -80,6 +80,9 @@ class MainActivity : AppCompatActivity() {
         
         // 设置默认IP
         binding.etServerIp.setText(serverIp)
+        
+        // 启用自动滚动到底部
+        binding.rvHistory.isNestedScrollingEnabled = false
     }
     
     private fun setupClickListeners() {

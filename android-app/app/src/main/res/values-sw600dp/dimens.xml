@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 大屏幕设备（> 6英寸）优化 -->
+<resources>
+    <!-- 间距 -->
+    <dimen name="spacing_tiny">6dp</dimen>
+    <dimen name="spacing_small">10dp</dimen>
+    <dimen name="spacing_medium">16dp</dimen>
+    <dimen name="spacing_large">20dp</dimen>
+    <dimen name="spacing_xlarge">24dp</dimen>
+    
+    <!-- 屏幕边距 -->
+    <dimen name="screen_padding_horizontal">24dp</dimen>
+    <dimen name="screen_padding_vertical">20dp</dimen>
+    <dimen name="screen_padding_bottom">32dp</dimen>
+    
+    <!-- 卡片样式 -->
+    <dimen name="card_radius">16dp</dimen>
+    <dimen name="card_radius_large">20dp</dimen>
+    <dimen name="card_elevation">3dp</dimen>
+    <dimen name="card_elevation_medium">5dp</dimen>
+    
+    <!-- 卡片内边距 -->
+    <dimen name="card_padding">20dp</dimen>
+    <dimen name="card_padding_large">24dp</dimen>
+    <dimen name="item_padding">16dp</dimen>
+    
+    <!-- 字体大小 -->
+    <dimen name="text_size_caption">13sp</dimen>
+    <dimen name="text_size_small">15sp</dimen>
+    <dimen name="text_size_normal">17sp</dimen>
+    <dimen name="text_size_button">17sp</dimen>
+    <dimen name="text_size_title">20sp</dimen>
+    <dimen name="text_size_large">22sp</dimen>
+    
+    <!-- 图标尺寸 -->
+    <dimen name="icon_size">56dp</dimen>
+    <dimen name="icon_padding">10dp</dimen>
+    <dimen name="status_icon_size">36dp</dimen>
+    
+    <!-- 触摸目标最小尺寸 -->
+    <dimen name="touch_target_min">48dp</dimen>
+    
+    <!-- 按钮高度 -->
+    <dimen name="button_height">60dp</dimen>
+    <dimen name="button_height_large">68dp</dimen>
+</resources>
