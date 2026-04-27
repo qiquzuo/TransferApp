@@ -1,0 +1,107 @@
+name: 📦 Auto Release Portable Version
+
+on:
+  push:
+    tags:
+      - 'v*'  # 当推送版本标签时触发，如 v1.0.0, v2.1.0
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: 📦 Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+      
+      - name: 🔨 Build Executable
+        run: |
+          echo "Building executable..."
+          pyinstaller --onefile --windowed --name=FileTransferServer server.py
+          echo "Build completed!"
+      
+      - name: 📋 Prepare Release Files
+        run: |
+          # 创建发布目录
+          mkdir release_package
+          
+          # 复制必要文件
+          Copy-Item dist\FileTransferServer.exe release_package\
+          Copy-Item start_server.bat release_package\
+          Copy-Item README.md release_package\
+          Copy-Item requirements.txt release_package\
+          
+          # 创建接收文件目录
+          mkdir release_package\received_files
+          
+          echo "Release package prepared!"
+      
+      - name: 🗜️ Create ZIP Archive
+        run: |
+          # 获取版本号（从tag或生成）
+          $version = if ($env:GITHUB_REF -match 'refs/tags/v(.*)') { 
+            $matches[1] 
+          } else { 
+            (Get-Date).ToString('yyyyMMdd_HHmmss') 
+          }
+          
+          $zipName = "FileTransferServer_Portable_v${version}.zip"
+          
+          # 压缩为ZIP
+          Compress-Archive -Path release_package\* -DestinationPath $zipName -Force
+          
+          echo "ZIP_NAME=$zipName" >> $env:GITHUB_ENV
+          echo "Created: $zipName"
+      
+      - name: 📤 Upload to GitHub Releases
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.ZIP_NAME }}
+          name: "📦 TransferApp v${{ env.ZIP_NAME -replace '.*_v(.*)\.zip', '$1' }}"
+          body: |
+            ## 🚀 局域网文件传输助手 - 便携版
+            
+            ### ✨ 特性
+            - ✅ 无需安装，解压即用
+            - ✅ 支持文件、图片、文本传输
+            - ✅ 跨平台：Windows电脑 ↔ Android手机
+            - ✅ 美观的Web界面
+            - ✅ 自动刷新历史记录
+            - ✅ Enter快速发送文本
+            
+            ### 📋 使用说明
+            1. 解压ZIP文件
+            2. 双击 `start_server.bat` 启动服务器
+            3. 浏览器访问显示的地址
+            4. 手机扫描二维码或输入URL
+            
+            ### 🔧 系统要求
+            - Windows 7/8/10/11
+            - 无需安装Python
+            
+            ### 📝 更新日志
+            自动构建于 ${{ github.event.head_commit.timestamp || github.run_started_at }}
+          draft: false
+          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: ✅ Release Complete
+        run: |
+          echo "========================================="
+          echo "✅ Release completed successfully!"
+          echo "📦 File: ${{ env.ZIP_NAME }}"
+          echo "🔗 URL: https://github.com/${{ github.repository }}/releases"
+          echo "========================================="
