@@ -38,8 +38,8 @@ instance/
 .DS_Store
 Thumbs.db
 
-# Received files (optional - remove if you want to keep)
-# received_files/
+# Received files (runtime directory, auto-created by server)
+received_files/
 
 # Android
 android-app/.gradle/
