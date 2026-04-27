@@ -22,22 +22,21 @@ def get_desktop_html_template():
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
         
         .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.1);
             max-width: 1400px;
             width: 100%;
-            padding: 30px;
+            margin: 0 auto;
+            padding: 24px 30px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
+            gap: 24px;
         }
         
         @media (max-width: 1024px) {
@@ -49,114 +48,160 @@ def get_desktop_html_template():
         
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             grid-column: 1 / -1;
         }
         
         .header h1 {
             color: #667eea;
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 2em;
+            margin-bottom: 6px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .header .server-url {
+            color: #999;
+            font-size: 0.9em;
+            font-family: 'Courier New', monospace;
+            background: rgba(102, 126, 234, 0.08);
+            padding: 4px 12px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 4px;
         }
         
         .header p {
             color: #666;
-            font-size: 1.1em;
+            font-size: 0.95em;
+            margin-top: 8px;
         }
         
         .left-panel {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
         }
         
         .right-panel {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            max-height: calc(100vh - 200px);
-            overflow-y: auto;
+            gap: 16px;
         }
         
         .qr-section {
             text-align: center;
-            margin: 30px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 15px;
+            padding: 16px;
+            background: rgba(248, 249, 250, 0.6);
+            backdrop-filter: blur(5px);
+            border-radius: 16px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .qr-section h3 {
+            font-size: 0.95em;
+            color: #667eea;
+            margin-bottom: 12px;
+            font-weight: 600;
         }
         
         .qr-code {
-            width: 200px;
-            height: 200px;
-            margin: 15px auto;
-            border: 3px solid #667eea;
-            border-radius: 10px;
-            padding: 10px;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 8px;
             background: white;
+            transition: all 0.3s ease;
         }
         
-        .server-info {
-            background: #e3f2fd;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            text-align: center;
+        .qr-code:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
         }
         
-        .server-info code {
-            font-size: 1.1em;
-            color: #1976d2;
-            font-weight: bold;
-        }
+
         
         .upload-zone {
-            border: 3px dashed #667eea;
-            border-radius: 15px;
-            padding: 60px 20px;
+            border: 2px dashed rgba(102, 126, 234, 0.4);
+            border-radius: 16px;
+            padding: 40px 20px;
             text-align: center;
-            background: #f8f9ff;
-            transition: all 0.3s ease;
+            background: rgba(248, 249, 255, 0.5);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
-            margin: 30px 0;
         }
         
         .upload-zone:hover {
-            background: #eef0ff;
-            border-color: #764ba2;
+            background: rgba(238, 240, 255, 0.7);
+            border-color: #667eea;
             transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+        }
+        
+        .upload-zone:active {
+            transform: translateY(0);
         }
         
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-size: 1em;
+            padding: 12px 28px;
+            border-radius: 20px;
+            font-size: 0.95em;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 10px 5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 8px 4px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
         }
         
         .history-item {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 10px;
-            margin: 8px 0;
+            background: rgba(248, 249, 250, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 12px 14px;
+            border-radius: 12px;
+            margin: 6px 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            transition: all 0.2s ease;
+        }
+        
+        .history-item:hover {
+            background: rgba(238, 240, 255, 0.9);
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
         }
         
         .thumbnail {
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 10px;
             margin-right: 10px;
             cursor: pointer;
-            border: 2px solid #667eea;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.2s ease;
+        }
+        
+        .thumbnail:hover {
+            transform: scale(1.1);
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
         
         .btn-small {
@@ -187,19 +232,23 @@ def get_desktop_html_template():
             position: fixed;
             bottom: 30px;
             left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
             color: white;
             padding: 12px 24px;
-            border-radius: 25px;
+            border-radius: 20px;
             font-size: 14px;
+            font-weight: 500;
             z-index: 1000;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
         }
         
         .toast.show {
             opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
     </style>
 </head>
@@ -207,33 +256,29 @@ def get_desktop_html_template():
     <div class="container">
         <div class="header">
             <h1>💻 局域网文件传输</h1>
+            <div class="server-url">{{ server_url }}</div>
             <p>快速在手机和电脑之间传输文件、图片和文本</p>
         </div>
         
         <div class="left-panel">
             <div class="qr-section">
-                <h3>手机扫描二维码连接</h3>
+                <h3>📱 手机扫描连接</h3>
                 <img src="{{ qr_code }}" alt="QR Code" class="qr-code">
             </div>
             
-            <div class="server-info">
-                <p>服务器地址：</p>
-                <code>{{ server_url }} (本机地址)</code>
-            </div>
-            
             <div class="upload-zone" id="uploadZone">
-                <div style="font-size: 4em; margin-bottom: 15px;">📁</div>
-                <div style="font-size: 1.3em; color: #667eea;">拖拽文件到此处或点击选择</div>
+                <div style="font-size: 3em; margin-bottom: 12px;">📁</div>
+                <div style="font-size: 1.1em; color: #667eea; font-weight: 500;">拖拽文件到此处或点击选择</div>
                 <input type="file" id="fileInput" style="display: none;" multiple>
             </div>
         </div>
         
         <div class="right-panel">
-            <div style="padding: 20px; background: #f8f9fa; border-radius: 15px;">
-                <h3 style="margin-bottom: 15px; color: #667eea;">📝 发送文本</h3>
+            <div style="padding: 16px; background: rgba(248, 249, 250, 0.6); backdrop-filter: blur(5px); border-radius: 16px; border: 1px solid rgba(102, 126, 234, 0.1);">
+                <h3 style="margin-bottom: 12px; color: #667eea; font-size: 1em; font-weight: 600;">📝 发送文本</h3>
                 <textarea id="textInput" placeholder="输入要发送的文本或链接..." 
-                    style="width: 100%; min-height: 120px; padding: 15px; border: 2px solid #ddd; border-radius: 10px;"></textarea>
-                <div style="margin-top: 15px; text-align: center;">
+                    style="width: 100%; min-height: 80px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 0.95em; transition: all 0.2s;"></textarea>
+                <div style="margin-top: 12px; text-align: center;">
                     <button class="btn" onclick="sendText()">发送文本</button>
                 </div>
             </div>
@@ -272,7 +317,7 @@ def get_desktop_html_template():
         // 自动刷新相关变量
         let autoRefreshInterval = null;
         let isAutoRefreshEnabled = true;
-        const REFRESH_INTERVAL = 2000; // 2秒
+        const REFRESH_INTERVAL = 1000; // 1秒
         
         function showToast(message) {
             const toast = document.getElementById('toast');
@@ -298,6 +343,21 @@ def get_desktop_html_template():
                 showToast('❌ 发送失败');
             }
         }
+        
+        // 文本框键盘事件：Enter发送，Shift+Enter换行
+        document.addEventListener('DOMContentLoaded', () => {
+            const textInput = document.getElementById('textInput');
+            if (textInput) {
+                textInput.addEventListener('keydown', (e) => {
+                    // Enter键（不按Shift）
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault(); // 阻止默认换行
+                        sendText(); // 发送文本
+                    }
+                    // Shift+Enter：允许默认换行行为，不做任何处理
+                });
+            }
+        });
         
         async function copyText(text) {
             try {
@@ -572,9 +632,9 @@ def get_mobile_html_template():
         .header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            padding: 16px 20px;
+            padding: 14px 20px;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -582,39 +642,42 @@ def get_mobile_html_template():
         
         .header h1 {
             color: #667eea;
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
         }
         
         .header p {
-            color: #666;
-            font-size: 12px;
-            margin-top: 4px;
+            color: #999;
+            font-size: 11px;
+            margin-top: 3px;
         }
         
         /* 主内容区 */
         .content {
-            padding: 16px;
+            padding: 12px;
             padding-bottom: 80px;
         }
         
         /* 卡片样式 */
         .card {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .card-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: #333;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         
         /* 快捷操作按钮网格 */
@@ -630,23 +693,23 @@ def get_mobile_html_template():
             color: white;
             border: none;
             border-radius: 12px;
-            padding: 20px 16px;
-            font-size: 15px;
-            font-weight: 500;
+            padding: 16px 12px;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
-            min-height: 80px;
+            gap: 6px;
+            min-height: 70px;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
         }
         
         .action-btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+            transform: scale(0.96);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
         }
         
         .action-btn.secondary {
@@ -660,25 +723,26 @@ def get_mobile_html_template():
         }
         
         .action-icon {
-            font-size: 28px;
+            font-size: 24px;
         }
         
         /* 文本输入区 */
         .text-input-area {
             width: 100%;
-            min-height: 120px;
-            padding: 14px;
+            min-height: 100px;
+            padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 12px;
-            font-size: 15px;
+            font-size: 14px;
             resize: none;
             font-family: inherit;
-            transition: border-color 0.2s;
+            transition: all 0.2s ease;
         }
         
         .text-input-area:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
         .send-btn {
@@ -687,16 +751,18 @@ def get_mobile_html_template():
             color: white;
             border: none;
             border-radius: 12px;
-            padding: 16px;
-            font-size: 16px;
+            padding: 14px;
+            font-size: 15px;
             font-weight: 600;
-            margin-top: 12px;
+            margin-top: 10px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .send-btn:active {
             transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
         }
         
         /* 历史记录列表 */
@@ -707,27 +773,35 @@ def get_mobile_html_template():
         }
         
         .history-item {
-            background: #f8f9fa;
+            background: rgba(248, 249, 250, 0.8);
+            backdrop-filter: blur(5px);
             border-radius: 12px;
-            padding: 14px;
+            padding: 12px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            transition: all 0.2s;
+            gap: 10px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0, 0, 0, 0.04);
         }
         
         .history-item:active {
-            background: #eef0ff;
+            background: rgba(238, 240, 255, 0.9);
             transform: scale(0.98);
         }
         
         .history-icon {
-            width: 44px;
-            height: 44px;
+            width: 42px;
+            height: 42px;
             border-radius: 10px;
             object-fit: cover;
-            border: 2px solid #667eea;
+            border: 2px solid rgba(102, 126, 234, 0.3);
             flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+        
+        .history-icon:hover {
+            transform: scale(1.05);
+            border-color: #667eea;
         }
         
         .history-info {
@@ -736,17 +810,17 @@ def get_mobile_html_template():
         }
         
         .history-name {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: #333;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
         
         .history-time {
-            font-size: 12px;
+            font-size: 11px;
             color: #999;
         }
         
@@ -945,7 +1019,7 @@ def get_mobile_html_template():
         // 自动刷新相关变量
         let autoRefreshInterval = null;
         let isAutoRefreshEnabled = true;
-        const REFRESH_INTERVAL = 2000; // 2秒
+        const REFRESH_INTERVAL = 1000; // 1秒
         
         // 显示Toast
         function showToast(message) {
@@ -985,6 +1059,21 @@ def get_mobile_html_template():
                 showToast('❌ 发送失败');
             }
         }
+        
+        // 文本框键盘事件：Enter发送，Shift+Enter换行
+        document.addEventListener('DOMContentLoaded', () => {
+            const textInput = document.getElementById('textInput');
+            if (textInput) {
+                textInput.addEventListener('keydown', (e) => {
+                    // Enter键（不按Shift）
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault(); // 阻止默认换行
+                        sendText(); // 发送文本
+                    }
+                    // Shift+Enter：允许默认换行行为，不做任何处理
+                });
+            }
+        });
         
         // 从剪贴板粘贴
         async function pasteFromClipboard() {
