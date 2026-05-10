@@ -342,7 +342,7 @@ def get_desktop_html_template():
                     <img src="/api/download/{{ item.filename }}" class="thumbnail" alt="预览" onclick="showImagePreview('{{ item.filename }}')">
                     {% endif %}
                     <div style="flex: 1; min-width: 0; max-width: calc(100% - 100px);">
-                        <strong style="word-wrap: break-word; word-break: break-all; overflow-wrap: break-word; line-height: 1.5; display: block;">{{ item.name }}</strong>
+                        <strong style="word-wrap: break-word; word-break: break-all; overflow-wrap: break-word; line-height: 1.6; display: block; white-space: pre-wrap;">{{ item.name }}</strong>
                         <div style="color: #999; font-size: 0.85em; margin-top: 4px;">{{ item.time }}</div>
                     </div>
                     <div style="display: flex; gap: 6px;">
@@ -604,9 +604,9 @@ def get_desktop_html_template():
             return `
                 <div class="history-item" data-time="${item.time}" data-filename="${item.filename}">
                     ${iconHtml}
-                    <div style="flex: 1;">
-                        <strong>${escapeHtml(item.name)}</strong>
-                        <div style="color: #999; font-size: 0.85em;">${item.time}</div>
+                    <div style="flex: 1; min-width: 0; max-width: calc(100% - 100px);">
+                        <strong style="word-wrap: break-word; word-break: break-all; overflow-wrap: break-word; line-height: 1.6; display: block; white-space: pre-wrap;">${escapeHtml(item.name)}</strong>
+                        <div style="color: #999; font-size: 0.85em; margin-top: 4px;">${item.time}</div>
                     </div>
                     <div style="display: flex; gap: 6px;">
                         ${actionButtons.join('')}
@@ -913,9 +913,10 @@ def get_mobile_html_template():
             word-wrap: break-word;
             word-break: break-all;
             overflow-wrap: break-word;
-            line-height: 1.5;
+            line-height: 1.6;
             margin-bottom: 3px;
             max-width: 100%;
+            white-space: pre-wrap;  /* 保留换行符并自动换行 */
         }
         
         .history-time {

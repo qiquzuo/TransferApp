@@ -250,11 +250,11 @@ def upload_text():
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(text)
     
-    # 记录历史
+    # 记录历史（保留完整文本内容）
     transfer_history.append({
         'type': 'text',
         'type_name': '链接' if is_link else '文本',
-        'name': text[:50] + '...' if len(text) > 50 else text,
+        'name': text,  # 保留完整文本，不截断
         'filename': filename,
         'time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'content': text,
