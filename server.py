@@ -21,6 +21,11 @@ from web_templates import get_desktop_html_template, get_mobile_html_template
 app = Flask(__name__)
 CORS(app)
 
+# 错误处理：文件大小超限
+@app.errorhandler(413)
+def too_large(e):
+    return jsonify({'success': False, 'message': '文件太大，最大支持100MB'}), 413
+
 # 速率限制器
 limiter = Limiter(
     app=app,
@@ -172,12 +177,30 @@ def upload_file():
         return jsonify({'success': False, 'message': f'不支持的文件类型: .{file_extension}'}), 400
     
     # 生成安全的存储文件名（添加时间戳避免重名）
-    safe_name = secure_filename(original_filename)
+    # 注意：保留原始文件名的扩展名，只清理不安全字符
+    import re
+    # 提取扩展名
+    if '.' in original_filename:
+        ext = '.' + original_filename.rsplit('.', 1)[1].lower()
+        # 清理文件名主体（保留中文、字母、数字、下划线、连字符、点）
+        name_part = original_filename.rsplit('.', 1)[0]
+        # 替换不安全字符为下划线
+        safe_name_part = re.sub(r'[^\w\u4e00-\u9fff\-.]', '_', name_part)
+        safe_name = safe_name_part + ext
+    else:
+        safe_name = secure_filename(original_filename)
+    
     timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S_')
     stored_filename = timestamp + safe_name
     
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], stored_filename)
-    file.save(filepath)
+    
+    # 保存文件，添加错误处理
+    try:
+        file.save(filepath)
+    except Exception as e:
+        print(f"❌ 文件保存失败: {e}")
+        return jsonify({'success': False, 'message': f'文件保存失败: {str(e)}'}), 500
     
     # SVG安全检查
     if file_extension == 'svg':
