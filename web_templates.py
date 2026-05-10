@@ -277,6 +277,11 @@ def get_desktop_html_template():
             object-fit: contain;
             border-radius: 8px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s;
+        }
+        
+        .image-modal img.loading {
+            opacity: 0.5;
         }
         
         .image-modal-close {
@@ -381,7 +386,23 @@ def get_desktop_html_template():
         function showImagePreview(filename) {
             const modal = document.getElementById('imageModal');
             const previewImg = document.getElementById('previewImage');
+            
+            // 显示加载状态
+            previewImg.classList.add('loading');
             previewImg.src = '/api/download/' + filename;
+            
+            // 图片加载完成后移除加载状态
+            previewImg.onload = function() {
+                previewImg.classList.remove('loading');
+            };
+            
+            // 图片加载失败处理
+            previewImg.onerror = function() {
+                previewImg.classList.remove('loading');
+                showToast('❌ 图片加载失败');
+                closeImagePreview();
+            };
+            
             modal.classList.add('active');
             document.body.style.overflow = 'hidden'; // 禁止背景滚动
         }
@@ -1117,7 +1138,23 @@ def get_mobile_html_template():
         function showImagePreview(filename) {
             const modal = document.getElementById('imageModal');
             const previewImg = document.getElementById('previewImage');
+            
+            // 显示加载状态
+            previewImg.classList.add('loading');
             previewImg.src = '/api/download/' + filename;
+            
+            // 图片加载完成后移除加载状态
+            previewImg.onload = function() {
+                previewImg.classList.remove('loading');
+            };
+            
+            // 图片加载失败处理
+            previewImg.onerror = function() {
+                previewImg.classList.remove('loading');
+                showToast('❌ 图片加载失败');
+                closeImagePreview();
+            };
+            
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
