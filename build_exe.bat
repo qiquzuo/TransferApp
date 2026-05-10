@@ -13,7 +13,7 @@ if exist server.spec del /q server.spec
 echo [1/3] 正在使用PyInstaller打包...
 pyinstaller --onefile ^
     --windowed ^
-    --name=FileTransferServer ^
+    --name=TransferClient ^
     --icon=NONE ^
     --add-data "requirements.txt;." ^
     --hidden-import=flask ^
@@ -38,7 +38,7 @@ REM 创建发布文件夹
 if not exist Release mkdir Release
 
 REM 复制exe到Release文件夹
-copy dist\FileTransferServer.exe Release\
+copy dist\TransferClient.exe Release\
 
 REM 复制说明文档
 copy README.md Release\
@@ -52,13 +52,12 @@ echo.
 echo 📦 发布文件位置: .\Release\
 echo.
 echo 包含的文件:
-echo   - FileTransferServer.exe  (主程序)
+echo   - TransferClient.exe  (主程序)
 echo   - README.md              (使用说明)
-echo   - QUICKSTART.md          (快速入门)
 echo.
 echo 🚀 使用方法:
 echo   1. 将整个Release文件夹拷贝到其他电脑
-echo   2. 双击运行 FileTransferServer.exe
+echo   2. 双击运行 TransferClient.exe
 echo   3. 无需安装Python或其他依赖！
 echo.
 echo 💡 提示:
