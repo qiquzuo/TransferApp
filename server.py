@@ -32,9 +32,22 @@ limiter = Limiter(
 # ==================== 配置 ====================
 UPLOAD_FOLDER = './received_files'
 ALLOWED_EXTENSIONS = {
-    'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'svg',
-    'pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt',
-    'zip', 'rar', 'mp4', 'mp3', 'avi', 'mov'
+    # 图片格式
+    'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'svg', 'ico', 'tiff', 'tif',
+    # 文档格式
+    'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+    # 文本格式
+    'txt', 'md', 'markdown', 'csv', 'json', 'xml', 'html', 'htm', 'css',
+    # 代码文件
+    'py', 'js', 'ts', 'java', 'cpp', 'c', 'h', 'hpp', 'cs', 'go', 'rs', 'rb',
+    'php', 'swift', 'kt', 'scala', 'r', 'm', 'mm', 'sql', 'sh', 'bash',
+    # 压缩包
+    'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'tgz',
+    # 音频视频
+    'mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm',
+    'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+    # 其他
+    'exe', 'dmg', 'apk', 'iso', 'torrent'
 }
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB
 
@@ -147,36 +160,42 @@ def upload_file():
     if file.filename == '':
         return jsonify({'success': False, 'message': '文件名为空'}), 400
     
-    if not allowed_file(file.filename):
-        return jsonify({'success': False, 'message': '不支持的文件类型'}), 400
+    # 保留原始文件名（用于显示和下载）
+    original_filename = file.filename
     
-    # 保留原始文件名
-    original_filename = secure_filename(file.filename)
+    # 安全检查：验证文件扩展名
+    if '.' not in original_filename:
+        return jsonify({'success': False, 'message': '不支持的文件类型（无扩展名）'}), 400
     
-    # 添加时间戳避免重名
+    file_extension = original_filename.rsplit('.', 1)[1].lower()
+    if file_extension not in ALLOWED_EXTENSIONS:
+        return jsonify({'success': False, 'message': f'不支持的文件类型: .{file_extension}'}), 400
+    
+    # 生成安全的存储文件名（添加时间戳避免重名）
+    safe_name = secure_filename(original_filename)
     timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S_')
-    stored_filename = timestamp + original_filename
+    stored_filename = timestamp + safe_name
     
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], stored_filename)
     file.save(filepath)
     
     # SVG安全检查
-    if stored_filename.lower().endswith('.svg'):
+    if file_extension == 'svg':
         if not sanitize_svg(filepath):
             os.remove(filepath)
             return jsonify({'success': False, 'message': 'SVG文件安全检查失败'}), 400
     
-    # 记录历史
-    file_type = 'image' if stored_filename.lower().endswith(
-        ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp', '.svg')
+    # 记录历史（保存原始文件名）
+    file_type = 'image' if file_extension in (
+        'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'svg', 'ico', 'tiff', 'tif'
     ) else 'file'
     
     transfer_history.append({
         'type': file_type,
         'type_name': '🖼️ 图片' if file_type == 'image' else '📁 文件',
-        'name': original_filename,
-        'filename': stored_filename,
-        'original_filename': original_filename,
+        'name': original_filename,  # 显示用原始文件名
+        'filename': stored_filename,  # 内部存储文件名
+        'original_filename': original_filename,  # 下载时用原始文件名
         'time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'size': os.path.getsize(filepath)
     })
@@ -224,32 +243,31 @@ def upload_text():
 
 @app.route('/api/download/<filename>')
 def download_file(filename):
-    """下载文件（支持预览和下载）"""
+    """下载文件（支持预览和下载，保持原始文件名）"""
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     
     if not os.path.exists(filepath):
         return jsonify({'success': False, 'message': '文件不存在'}), 404
     
-    # 查找原始文件名
-    original_filename = filename
+    # 从历史记录中查找原始文件名
+    original_filename = filename  # 默认使用存储文件名
     for item in transfer_history:
         if item.get('filename') == filename:
             original_filename = item.get('original_filename', filename)
             break
     
-    # 自动检测MIME类型
+    # 自动检测MIME类型（基于原始文件名的扩展名）
     import mimetypes
     mime_type, _ = mimetypes.guess_type(original_filename)
     if mime_type is None:
         mime_type = 'application/octet-stream'
     
-    # 判断是否为图片格式
-    is_image = original_filename.lower().endswith(
-        ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp', '.svg')
-    )
+    # 判断是否为图片格式（允许浏览器预览）
+    image_extensions = ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp', '.svg', '.ico', '.tiff', '.tif')
+    is_image = original_filename.lower().endswith(image_extensions)
     
     if is_image:
-        # 图片文件：允许浏览器预览（inline）
+        # 图片文件：允许浏览器预览（inline），但下载时使用原始文件名
         response = send_file(
             filepath,
             mimetype=mime_type,
@@ -257,14 +275,27 @@ def download_file(filename):
         )
         # 设置缓存控制，提高预览性能
         response.headers['Cache-Control'] = 'public, max-age=3600'
+        # 即使预览也设置正确的文件名（用户保存时会使用）
+        response.headers['Content-Disposition'] = f'inline; filename="{original_filename}"'
         return response
     else:
-        # 其他文件：强制下载（attachment）
+        # 其他文件：强制下载（attachment），使用原始文件名
+        # 处理中文文件名（RFC 5987编码）
+        try:
+            # 尝试UTF-8编码的文件名
+            from urllib.parse import quote
+            encoded_filename = quote(original_filename.encode('utf-8'))
+            content_disposition = f"attachment; filename*=UTF-8''{encoded_filename}"
+        except:
+            # 降级方案：使用ASCII文件名
+            ascii_filename = original_filename.encode('ascii', 'ignore').decode('ascii')
+            content_disposition = f'attachment; filename="{ascii_filename}"'
+        
         return send_file(
             filepath,
             mimetype=mime_type,
             as_attachment=True,
-            download_name=original_filename
+            download_name=original_filename  # Flask 2.0+ 支持
         )
 
 
