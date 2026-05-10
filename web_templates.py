@@ -176,7 +176,7 @@ def get_desktop_html_template():
             margin: 6px 0;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             border: 1px solid rgba(0, 0, 0, 0.04);
             transition: all 0.2s ease;
         }
@@ -275,9 +275,9 @@ def get_desktop_html_template():
         
         <div class="right-panel">
             <div style="padding: 16px; background: rgba(248, 249, 250, 0.6); backdrop-filter: blur(5px); border-radius: 16px; border: 1px solid rgba(102, 126, 234, 0.1);">
-                <h3 style="margin-bottom: 12px; color: #667eea; font-size: 1em; font-weight: 600;">📝 发送文本</h3>
-                <textarea id="textInput" placeholder="输入要发送的文本或链接..." 
-                    style="width: 100%; min-height: 80px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 0.95em; transition: all 0.2s;"></textarea>
+                <h3 style="margin-bottom: 12px; color: #667eea; font-size: 1em; font-weight: 600;">📝 发送文本/链接</h3>
+                <textarea id="textInput" placeholder="输入要发送的文本或链接（支持自动识别）..." 
+                    style="width: 100%; min-height: 100px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 0.95em; transition: all 0.2s; resize: vertical; word-wrap: break-word;"></textarea>
                 <div style="margin-top: 12px; text-align: center;">
                     <button class="btn" onclick="sendText()">发送文本</button>
                 </div>
@@ -291,9 +291,9 @@ def get_desktop_html_template():
                     {% if item.type == 'image' %}
                     <img src="/api/download/{{ item.filename }}" class="thumbnail" alt="预览">
                     {% endif %}
-                    <div style="flex: 1;">
-                        <strong>{{ item.name }}</strong>
-                        <div style="color: #999; font-size: 0.85em;">{{ item.time }}</div>
+                    <div style="flex: 1; min-width: 0; max-width: calc(100% - 100px);">
+                        <strong style="word-wrap: break-word; word-break: break-all; overflow-wrap: break-word; line-height: 1.5; display: block;">{{ item.name }}</strong>
+                        <div style="color: #999; font-size: 0.85em; margin-top: 4px;">{{ item.time }}</div>
                     </div>
                     <div style="display: flex; gap: 6px;">
                         {% if item.type == 'text' %}
@@ -729,14 +729,16 @@ def get_mobile_html_template():
         /* 文本输入区 */
         .text-input-area {
             width: 100%;
-            min-height: 100px;
+            min-height: 120px;
             padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 12px;
             font-size: 14px;
-            resize: none;
+            resize: vertical;
             font-family: inherit;
             transition: all 0.2s ease;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         
         .text-input-area:focus {
@@ -807,16 +809,19 @@ def get_mobile_html_template():
         .history-info {
             flex: 1;
             min-width: 0;
+            max-width: calc(100% - 120px);
         }
         
         .history-name {
             font-size: 13px;
             font-weight: 600;
             color: #333;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            line-height: 1.5;
             margin-bottom: 3px;
+            max-width: 100%;
         }
         
         .history-time {
@@ -968,8 +973,8 @@ def get_mobile_html_template():
         
         <!-- 文本输入（默认隐藏） -->
         <div class="card" id="textInputCard" style="display: none;">
-            <div class="card-title">📝 发送文本</div>
-            <textarea id="textInput" class="text-input-area" placeholder="输入要发送的文本或链接..."></textarea>
+            <div class="card-title">📝 发送文本/链接</div>
+            <textarea id="textInput" class="text-input-area" placeholder="输入要发送的文本或链接（支持自动识别）..."></textarea>
             <button class="send-btn" onclick="sendText()">发送</button>
         </div>
         
