@@ -250,6 +250,51 @@ def get_desktop_html_template():
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
+        
+        /* 图片预览模态框 */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .image-modal.active {
+            display: flex;
+        }
+        
+        .image-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        
+        .image-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 2001;
+        }
+        
+        .image-modal-close:hover {
+            transform: scale(1.2);
+            color: #667eea;
+        }
     </style>
 </head>
 <body>
@@ -289,7 +334,7 @@ def get_desktop_html_template():
                 {% for item in history %}
                 <div class="history-item">
                     {% if item.type == 'image' %}
-                    <img src="/api/download/{{ item.filename }}" class="thumbnail" alt="预览">
+                    <img src="/api/download/{{ item.filename }}" class="thumbnail" alt="预览" onclick="showImagePreview('{{ item.filename }}')">
                     {% endif %}
                     <div style="flex: 1; min-width: 0; max-width: calc(100% - 100px);">
                         <strong style="word-wrap: break-word; word-break: break-all; overflow-wrap: break-word; line-height: 1.5; display: block;">{{ item.name }}</strong>
@@ -313,6 +358,12 @@ def get_desktop_html_template():
     
     <div id="toast" class="toast"></div>
     
+    <!-- 图片预览模态框 -->
+    <div id="imageModal" class="image-modal" onclick="closeImagePreview()">
+        <span class="image-modal-close">&times;</span>
+        <img id="previewImage" src="" alt="预览">
+    </div>
+    
     <script>
         // 自动刷新相关变量
         let autoRefreshInterval = null;
@@ -325,6 +376,28 @@ def get_desktop_html_template():
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2000);
         }
+        
+        // 图片预览功能
+        function showImagePreview(filename) {
+            const modal = document.getElementById('imageModal');
+            const previewImg = document.getElementById('previewImage');
+            previewImg.src = '/api/download/' + filename;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // 禁止背景滚动
+        }
+        
+        function closeImagePreview() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // 恢复滚动
+        }
+        
+        // ESC键关闭预览
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeImagePreview();
+            }
+        });
         
         async function sendText() {
             const text = document.getElementById('textInput').value.trim();
@@ -491,7 +564,7 @@ def get_desktop_html_template():
          */
         function generateHistoryItemHTML(item) {
             const iconHtml = item.type === 'image' 
-                ? `<img src="/api/download/${item.filename}" class="thumbnail" alt="预览">`
+                ? `<img src="/api/download/${item.filename}" class="thumbnail" alt="预览" onclick="showImagePreview('${item.filename}')">`
                 : '';
             
             const actionButtons = [];
@@ -986,7 +1059,7 @@ def get_mobile_html_template():
                 {% for item in history %}
                 <div class="history-item">
                     {% if item.type == 'image' %}
-                    <img src="/api/download/{{ item.filename }}" class="history-icon" alt="">
+                    <img src="/api/download/{{ item.filename }}" class="history-icon" alt="" onclick="showImagePreview('{{ item.filename }}')">
                     {% else %}
                     <div class="history-icon" style="display: flex; align-items: center; justify-content: center; background: #f0f0f0; font-size: 20px;">
                         {% if item.type == 'text' %}📝{% else %}📁{% endif %}
@@ -1020,6 +1093,12 @@ def get_mobile_html_template():
     <!-- Toast提示 -->
     <div id="toast" class="toast"></div>
     
+    <!-- 图片预览模态框 -->
+    <div id="imageModal" class="image-modal" onclick="closeImagePreview()">
+        <span class="image-modal-close">&times;</span>
+        <img id="previewImage" src="" alt="预览">
+    </div>
+    
     <script>
         // 自动刷新相关变量
         let autoRefreshInterval = null;
@@ -1032,6 +1111,21 @@ def get_mobile_html_template():
             toast.textContent = message;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        // 图片预览功能
+        function showImagePreview(filename) {
+            const modal = document.getElementById('imageModal');
+            const previewImg = document.getElementById('previewImage');
+            previewImg.src = '/api/download/' + filename;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeImagePreview() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
         }
         
         // 显示文本输入框
@@ -1234,7 +1328,7 @@ def get_mobile_html_template():
          */
         function generateHistoryItemHTML(item) {
             const iconHtml = item.type === 'image'
-                ? `<img src="/api/download/${item.filename}" class="history-icon" alt="">`
+                ? `<img src="/api/download/${item.filename}" class="history-icon" alt="" onclick="showImagePreview('${item.filename}')">`
                 : `<div class="history-icon" style="display: flex; align-items: center; justify-content: center; background: #f0f0f0; font-size: 20px;">${item.type === 'text' ? '📝' : '📁'}</div>`;
             
             const actionButtons = [];
