@@ -52,7 +52,7 @@ ALLOWED_EXTENSIONS = {
     'mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm',
     'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
     # 其他
-    'exe', 'dmg', 'apk', 'iso', 'torrent'
+    'iso', 'torrent'
 }
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB
 
@@ -267,7 +267,17 @@ def upload_text():
 @app.route('/api/download/<filename>')
 def download_file(filename):
     """下载文件（支持预览和下载，保持原始文件名）"""
+    # 安全检查：防止路径遍历攻击
+    if '..' in filename or '/' in filename or '\\' in filename:
+        return jsonify({'success': False, 'message': '非法文件名'}), 400
+    
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    
+    # 二次校验：确保文件在上传目录内
+    real_path = os.path.realpath(filepath)
+    real_upload = os.path.realpath(app.config['UPLOAD_FOLDER'])
+    if not real_path.startswith(real_upload + os.sep):
+        return jsonify({'success': False, 'message': '非法路径'}), 400
     
     if not os.path.exists(filepath):
         return jsonify({'success': False, 'message': '文件不存在'}), 404
