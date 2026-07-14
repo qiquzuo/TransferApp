@@ -28,7 +28,7 @@ jobs:
       - name: 🔨 Build Executable
         run: |
           echo "Building executable..."
-          pyinstaller --onefile --windowed --name=FileTransferServer server.py
+          pyinstaller --onefile --windowed --name=FileTransferServer --hidden-import=flask --hidden-import=flask_cors --hidden-import=flask_limiter --hidden-import=qrcode --hidden-import=PIL server.py
           echo "Build completed!"
       
       - name: 📋 Prepare Release Files

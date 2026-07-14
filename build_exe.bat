@@ -18,6 +18,7 @@ pyinstaller --onefile ^
     --add-data "requirements.txt;." ^
     --hidden-import=flask ^
     --hidden-import=flask_cors ^
+    --hidden-import=flask_limiter ^
     --hidden-import=qrcode ^
     --hidden-import=PIL ^
     server.py
@@ -42,7 +43,6 @@ copy dist\TransferClient.exe Release\
 
 REM 复制说明文档
 copy README.md Release\
-copy QUICKSTART.md Release\
 
 echo.
 echo ========================================
