@@ -178,12 +178,12 @@ def get_desktop_html_template():
             justify-content: space-between;
             align-items: flex-start;
             border: 1px solid rgba(0, 0, 0, 0.04);
-            transition: all 0.2s ease;
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+            will-change: background, box-shadow;
         }
         
         .history-item:hover {
             background: rgba(238, 240, 255, 0.9);
-            transform: translateX(4px);
             box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
         }
         
@@ -347,12 +347,12 @@ def get_desktop_html_template():
                     </div>
                     <div style="display: flex; gap: 6px;">
                         {% if item.type == 'text' %}
-                        <button class="btn-small btn-copy" onclick="copyText('{{ item.content }}')">📋</button>
+                        <button class="btn-small btn-copy" data-action="copy" data-content="{{ item.content }}">📋</button>
                         {% endif %}
                         {% if item.type != 'text' %}
                         <a href="/api/download/{{ item.filename }}" class="btn-small btn-download" download>⬇️</a>
                         {% endif %}
-                        <button class="btn-small btn-delete" onclick="deleteItem('{{ item.filename }}')">🗑️</button>
+                        <button class="btn-small btn-delete" data-action="delete" data-filename="{{ item.filename }}">🗑️</button>
                     </div>
                 </div>
                 {% endfor %}
@@ -512,6 +512,18 @@ def get_desktop_html_template():
             document.getElementById('fileInput').click();
         });
         
+        // 事件委托：处理历史记录按钮（兼容微信浏览器）
+        document.getElementById('historyList').addEventListener('click', function(e) {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+            const action = btn.dataset.action;
+            if (action === 'copy') {
+                copyText(btn.dataset.content || '');
+            } else if (action === 'delete') {
+                deleteItem(btn.dataset.filename || '');
+            }
+        });
+        
         document.getElementById('fileInput').addEventListener('change', async (e) => {
             const files = e.target.files;
             if (files.length === 0) return;
@@ -558,6 +570,17 @@ def get_desktop_html_template():
                 return;
             }
             
+            // 检查数据是否变化（通过比较历史记录数量和最新时间戳）
+            const existingItems = historyList.querySelectorAll('.history-item');
+            const currentCount = existingItems.length;
+            const firstOldTime = currentCount > 0 ? existingItems[0].dataset.time : '';
+            const newFirstTime = history.length > 0 ? history[0].time : '';
+            
+            // 如果数据没变化，跳过DOM更新，避免hover状态丢失导致闪烁
+            if (currentCount === history.length && firstOldTime === newFirstTime) {
+                return;
+            }
+            
             // 生成HTML
             let html = '';
             history.forEach(item => {
@@ -565,8 +588,7 @@ def get_desktop_html_template():
             });
             
             // 检查是否有新记录（通过比较第一个元素的时间戳）
-            const firstOldItem = historyList.querySelector('.history-item');
-            const hasNewRecords = !firstOldItem || (history.length > 0 && firstOldItem.dataset.time !== history[0].time);
+            const hasNewRecords = firstOldTime !== newFirstTime;
             
             // 更新DOM
             historyList.innerHTML = html;
@@ -591,15 +613,14 @@ def get_desktop_html_template():
             const actionButtons = [];
             
             if (item.type === 'text') {
-                const escapedContent = item.content.replace(/'/g, "\\'").replace(/"/g, '\\"');
-                actionButtons.push(`<button class="btn-small btn-copy" onclick="copyText('${escapedContent}')">📋</button>`);
+                actionButtons.push(`<button class="btn-small btn-copy" data-action="copy" data-content="${escapeHtml(item.content)}">📋</button>`);
             }
             
             if (item.type !== 'text') {
                 actionButtons.push(`<a href="/api/download/${item.filename}" class="btn-small btn-download" download>⬇️</a>`);
             }
             
-            actionButtons.push(`<button class="btn-small btn-delete" onclick="deleteItem('${item.filename}')">🗑️</button>`);
+            actionButtons.push(`<button class="btn-small btn-delete" data-action="delete" data-filename="${item.filename}">🗑️</button>`);
             
             return `
                 <div class="history-item" data-time="${item.time}" data-filename="${item.filename}">
@@ -876,13 +897,12 @@ def get_mobile_html_template():
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: background 0.2s ease;
             border: 1px solid rgba(0, 0, 0, 0.04);
         }
         
         .history-item:active {
             background: rgba(238, 240, 255, 0.9);
-            transform: scale(0.98);
         }
         
         .history-icon {
@@ -903,7 +923,7 @@ def get_mobile_html_template():
         .history-info {
             flex: 1;
             min-width: 0;
-            max-width: calc(100% - 120px);
+            max-width: calc(100% - 155px);
         }
         
         .history-name {
@@ -926,25 +946,27 @@ def get_mobile_html_template():
         
         .history-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-shrink: 0;
         }
         
         .icon-btn {
-            width: 36px;
-            height: 36px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             border: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 20px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         
         .icon-btn:active {
-            transform: scale(0.9);
+            opacity: 0.7;
         }
         
         .icon-btn.copy {
@@ -1031,6 +1053,56 @@ def get_mobile_html_template():
         #fileInput {
             display: none;
         }
+        
+        /* 图片预览模态框 */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .image-modal.active {
+            display: flex;
+        }
+        
+        .image-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s;
+        }
+        
+        .image-modal img.loading {
+            opacity: 0.5;
+        }
+        
+        .image-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 2001;
+        }
+        
+        .image-modal-close:hover {
+            transform: scale(1.2);
+            color: #667eea;
+        }
     </style>
 </head>
 <body>
@@ -1093,12 +1165,12 @@ def get_mobile_html_template():
                     </div>
                     <div class="history-actions">
                         {% if item.type == 'text' %}
-                        <button class="icon-btn copy" onclick="copyText('{{ item.content | replace("'", "\\'") }}')">📋</button>
+                        <button class="icon-btn copy" data-action="copy" data-content="{{ item.content }}">📋</button>
                         {% endif %}
                         {% if item.type != 'text' %}
                         <a href="/api/download/{{ item.filename }}" class="icon-btn download" download>⬇️</a>
                         {% endif %}
-                        <button class="icon-btn delete" onclick="deleteItem('{{ item.filename }}')">🗑️</button>
+                        <button class="icon-btn delete" data-action="delete" data-filename="{{ item.filename }}">🗑️</button>
                     </div>
                 </div>
                 {% endfor %}
@@ -1209,19 +1281,47 @@ def get_mobile_html_template():
                     }
                     // Shift+Enter：允许默认换行行为，不做任何处理
                 });
+                
+                // 原生粘贴事件：自动捕获剪贴板内容并发送
+                // 这是移动端最可靠的剪贴板读取方式，兼容所有浏览器（包括微信）
+                textInput.addEventListener('paste', (e) => {
+                    const pasteData = (e.clipboardData || window.clipboardData).getData('text');
+                    if (!pasteData || !pasteData.trim()) return;
+                    
+                    e.preventDefault();
+                    textInput.value = pasteData;
+                    showToast('✅ 已粘贴，正在发送...');
+                    setTimeout(() => sendText(), 150);
+                });
             }
         });
         
-        // 从剪贴板粘贴
+        // 从剪贴板粘贴（移动端优化）
         async function pasteFromClipboard() {
-            try {
-                const text = await navigator.clipboard.readText();
-                document.getElementById('textInput').value = text;
-                showTextInput();
-                showToast('✅ 已粘贴');
-            } catch (error) {
-                showToast('❌ 无法访问剪贴板');
+            const textInput = document.getElementById('textInput');
+            const card = document.getElementById('textInputCard');
+            
+            // 显示文本输入区并聚焦
+            card.style.display = 'block';
+            textInput.focus();
+            
+            // 尝试通过 Clipboard API 直接读取（仅部分浏览器支持）
+            if (navigator.clipboard && navigator.clipboard.readText) {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (text && text.trim()) {
+                        textInput.value = text;
+                        showToast('✅ 已粘贴，正在发送...');
+                        setTimeout(() => sendText(), 100);
+                        return;
+                    }
+                } catch (e) {
+                    // Clipboard API 不可用，回退到原生粘贴
+                }
             }
+            
+            // 回退方案：提示用户通过系统粘贴操作粘贴
+            showToast('📋 请长按文本框并选择粘贴');
         }
         
         // 复制文本
@@ -1281,6 +1381,18 @@ def get_mobile_html_template():
             }
         }
         
+        // 事件委托：处理历史记录按钮（兼容微信浏览器）
+        document.getElementById('historyList').addEventListener('click', function(e) {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+            const action = btn.dataset.action;
+            if (action === 'copy') {
+                copyText(btn.dataset.content || '');
+            } else if (action === 'delete') {
+                deleteItem(btn.dataset.filename || '');
+            }
+        });
+        
         // 文件上传
         document.getElementById('fileInput').addEventListener('change', async (e) => {
             const files = e.target.files;
@@ -1339,6 +1451,17 @@ def get_mobile_html_template():
                 return;
             }
             
+            // 检查数据是否变化（通过比较历史记录数量和最新时间戳）
+            const existingItems = historyList.querySelectorAll('.history-item');
+            const currentCount = existingItems.length;
+            const firstOldTime = currentCount > 0 ? existingItems[0].dataset.time : '';
+            const newFirstTime = history.length > 0 ? history[0].time : '';
+            
+            // 如果数据没变化，跳过DOM更新，避免hover状态丢失导致闪烁
+            if (currentCount === history.length && firstOldTime === newFirstTime) {
+                return;
+            }
+            
             // 生成HTML
             let html = '';
             history.forEach(item => {
@@ -1346,8 +1469,7 @@ def get_mobile_html_template():
             });
             
             // 检查是否有新记录
-            const firstOldItem = historyList.querySelector('.history-item');
-            const hasNewRecords = !firstOldItem || (history.length > 0 && firstOldItem.dataset.time !== history[0].time);
+            const hasNewRecords = firstOldTime !== newFirstTime;
             
             // 更新DOM
             historyList.innerHTML = html;
@@ -1372,15 +1494,14 @@ def get_mobile_html_template():
             const actionButtons = [];
             
             if (item.type === 'text') {
-                const escapedContent = item.content.replace(/'/g, "\\'").replace(/"/g, '\\"');
-                actionButtons.push(`<button class="icon-btn copy" onclick="copyText('${escapedContent}')">📋</button>`);
+                actionButtons.push(`<button class="icon-btn copy" data-action="copy" data-content="${escapeHtml(item.content)}">📋</button>`);
             }
             
             if (item.type !== 'text') {
                 actionButtons.push(`<a href="/api/download/${item.filename}" class="icon-btn download" download>⬇️</a>`);
             }
             
-            actionButtons.push(`<button class="icon-btn delete" onclick="deleteItem('${item.filename}')">🗑️</button>`);
+            actionButtons.push(`<button class="icon-btn delete" data-action="delete" data-filename="${item.filename}">🗑️</button>`);
             
             return `
                 <div class="history-item" data-time="${item.time}" data-filename="${item.filename}">

@@ -1,3 +1,78 @@
+# TransferApp - 局域网文件传输助手
+
+跨平台局域网文件传输工具，实现 Windows ↔ Android 之间的高速文件、文本传输。无需互联网，扫码即用。
+
+## 功能
+
+- 局域网直连传输，速度 10MB/s+，无文件大小限制
+- 支持任意文件格式，拖拽批量上传
+- 文本/链接快速发送，Enter 发送，Shift+Enter 换行
+- 图片浏览器内预览，无需下载
+- 传输历史实时同步，自动刷新
+- 一键复制/粘贴剪贴板内容
+- 电脑端/手机端独立 UI，响应式布局
+- 纯局域网传输，数据不经过云端
+- 便携版解压即用，无需安装 Python
+
+## 快速开始
+
+### 便携版（推荐）
+
+1. 下载 [最新 Release](https://github.com/qiquzuo/TransferApp/releases/latest)
+2. 解压并双击 `start_server.bat`
+3. 浏览器打开显示的地址（如 `http://192.168.1.100:5000`）
+4. 手机扫码或手动输入 URL
+
+### 源码运行
+
+```bash
+pip install -r requirements.txt
+python server.py
+```
+
+### Android App
+
+安装 `android-app/app/build/outputs/apk/release/app-release.apk`，打开后扫描电脑端二维码。
+
+## 前提条件
+
+- 电脑和手机在同一 WiFi/热点下
+- 防火墙允许 5000 端口通信
+
+## 快捷键
+
+| 快捷键 | 功能 |
+|--------|------|
+| Enter | 发送文本 |
+| Shift+Enter | 换行 |
+| 拖拽文件 | 批量上传 |
+
+## 技术栈
+
+- **后端：** Python + Flask + Flask-Limiter
+- **前端：** 原生 HTML/CSS/JS，玻璃拟态 UI
+- **移动端：** Kotlin + Retrofit (Android App)
+- **打包：** PyInstaller → exe
+
+## 配置
+
+编辑 `server.py`：
+
+- 修改端口：`app.run(host='0.0.0.0', port=5000)`
+- 修改文件大小限制：`MAX_FILE_SIZE = 100 * 1024 * 1024`
+- 修改允许的文件类型：`ALLOWED_EXTENSIONS = {...}`
+
+## 常见问题
+
+**手机无法连接？** 确认同一 WiFi → 检查 IP 同网段 → 检查防火墙入站规则（TCP 5000）→ 临时关闭杀毒软件测试
+
+**上传失败？** 检查文件大小（默认 100MB）和格式是否在 `ALLOWED_EXTENSIONS` 中
+
+**页面异常？** Ctrl+F5 硬刷新，或检查浏览器版本（Chrome 60+）
+
+## 许可证
+
+MIT License
 # 📱 TransferApp - 局域网文件传输助手
 
 <div align="center">
