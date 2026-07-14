@@ -52,3 +52,9 @@ android-app/local.properties
 
 # Logs
 *.log
+
+# Build outputs
+Release/
+Release_AutoStart/
+*.spec
+TransferApp_*.zip
