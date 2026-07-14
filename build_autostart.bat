@@ -13,6 +13,7 @@ echo [1/3] 正在使用PyInstaller打包...
 pyinstaller --onefile ^
     --windowed ^
     --name=TransferApp ^
+    --icon=app_icon.ico ^
     --add-data "requirements.txt;." ^
     --hidden-import=flask ^
     --hidden-import=flask_cors ^
